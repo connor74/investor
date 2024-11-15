@@ -1,0 +1,7 @@
+ticker;category;base;engines;markets;boards;percent;volume
+EQMX;акции;IMOEX;stock;shares;tqbr;25;328
+SBMX;акции;IMOEX;stock;shares;tqbr;25;2510
+SBSC;акции;IMOEX;stock;shares;tqbr;5;1160
+OBLG;облигации;RUCBTRNS;stock;shares;tqtf;25;14
+GOLD;металлы;GLDRUB_TOM;stock;shares;tqtf;15;800
+CNYM;валюта;;stock;shares;tqty;5;15
