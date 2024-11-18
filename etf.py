@@ -5,6 +5,7 @@ import pandas as pd
 import json
 
 pd.set_option('display.max_rows', None)
+pd.set_option('display.max_colwidth', 15)
 # https://iss.moex.com/iss/engines/currency/markets/selt/boards/CETS/securities/GLDRUB_TOM.json?iss.meta=off&iss.only=marketdata
 # https://iss.moex.com/iss/engines/currency/markets/selt/boards/CETS/securities/GLDRUB_TOM/candles.json?from=2024-01-08&till=2024-03=20&interval=60
 
@@ -29,12 +30,16 @@ def read_index(index_name: str)->pd.DataFrame:
     return pd.read_csv(data_dir+index_name+".csv", sep=";", encoding="Windows-1251")
 
 
-def get_price(ticker):
-    pass
+def get_sec_data(df: pd.DataFrame):
+    '''
+    :param df:
+    :return:
+    '''
+    r = requests.get(df["url"], params={"iss.meta": "off", "marketdata.columns": "SECID,BID"}).json()["securities"]["data"][0][3]
+    return r
 
 
-
-def sec_price(etf_portfolio: pd.DataFrame):
+def sec_data(etf_portfolio: pd.DataFrame):
     '''
     :param etf_portfolio:
     :param etf_params:
@@ -45,26 +50,22 @@ def sec_price(etf_portfolio: pd.DataFrame):
                            "/markets/" + etf_portfolio['markets'] +\
                            "/boards/" + etf_portfolio['boards'] +\
                            "/securities/" + etf_portfolio['ticker'] + ".json"
-    for item in etf_portfolio["url"]:
-        print(item)
-    etf_portfolio["price"] = etf_portfolio["url"].apply(
-        lambda x: requests.get(x, params={
-                "iss.meta": "off",
-                "marketdata.columns": "SECID,BID"
-                }
-            ).json()["marketdata"]["data"][0][2]
-    )
-    print(etf_portfolio["price"])
 
-
+    etf_portfolio["price"] = etf_portfolio.apply(lambda x: get_sec_data(x), axis=1)
+    etf_portfolio["actual_amount"] = etf_portfolio["volume"] * etf_portfolio["price"]
+    etf_portfolio["plan_amount"] = total_sum * etf_portfolio["percent"] / 100
+    etf_portfolio["plan_volume"] = (etf_portfolio["plan_amount"] / etf_portfolio["price"]).astype(int)
+    print(etf_portfolio.groupby(["category"]).sum())
 
 
     print(etf_portfolio)
+    print(etf_portfolio.dtypes)
 
 
 print(total_sum)
 portfolio = read_portfolio()
 etf_params = read_params_json()
 df2 = read_index("imoex")
-sec_price(portfolio)
+sec_data(portfolio)
+
 
