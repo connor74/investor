@@ -14,7 +14,7 @@ pd.set_option('display.max_colwidth', 15)
 # "https://iss.moex.com/iss/engines/stock/markets/shares/securities/SBMX.json?iss.meta=off"
 
 
-total_sum = 492_000
+total_sum = 486_000
 data_dir = "N:\\KurzanovAV\\Только для чтения\\"
 
 
@@ -36,8 +36,8 @@ def get_etf_data(df: pd.DataFrame) -> Dict:
           "/markets/" + df['markets'] + \
           "/boards/" + df['boards'] + \
           "/securities/" + df['ticker'] + ".json"
-    r = requests.get(url, params={"iss.meta": "off", "marketdata.columns": "SECID,BID"}).json()["securities"]["data"][0][3]
-    return r
+    resp = requests.get(url, params={"iss.meta": "off", "marketdata.columns": "SECID,BID"})
+    return resp.json()["marketdata"]["data"][0][1]
 
 
 def get_index_data(df: pd.DataFrame) -> pd.DataFrame:
